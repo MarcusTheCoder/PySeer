@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<BasicShader>
+    <stage type="vertex_shader">#version 450 core
+layout (location=0) in vec3 position;
+uniform mat4 mvp;
+void main()
+{
+    gl_Position = mvp * vec4(position ,1.0);
+}
+
+    </stage>
+    <stage type="fragment_shader">#version 450 core
+#define SCALE 5.0
+uniform float time;
+uniform vec2 resolution;
+#define DISTANCE(X,Y,F) abs((Y) - (F(X))) 
+#define SOFTEQUAL(X,Y,F) 0.01 / atan( DISTANCE(X,Y,F) )
+#define DRAW(D,X,Y,F,R,G,B) float D = SOFTEQUAL(X,Y,F); gl_FragColor += vec4( R*D, G*D, B*D, 1.0 );
+
+#define EQUAL(X,Y) abs((Y) - (X)) &lt 0.01
+
+float cosWave( float x)
+{
+    return cos(x +time);
+}
+float circ1(float x)
+{
+    // x^2 + y^2 = 1 --> sqrt(1 - x^2) = y
+    return sqrt(1 - pow (x,2));
+}
+float circ2(float x)
+{
+    return -sqrt(1 - pow (x,2));
+}
+
+void main( void ) {
+    vec4 axisColor = vec4(1.0,0.0,0.4,1.0);
+    vec2 position = ( SCALE*gl_FragCoord.xy / resolution.xy ) - (SCALE / 2.0);
+    float y = position.y;
+    float x = position.x;
+        
+    DRAW( cosWave, x, y, cosWave, 0.4, 0.0, 0.5);
+    DRAW( circ1, x, y, circ1,0.0, 0.5, 0.1);
+    DRAW( circ2, x, y, circ2,0.0, 0.5, 0.1);
+    //draw axis
+    /*if( EQUAL(y, 0.0))
+    {
+        gl_FragColor = axisColor;
+    }
+        
+    if( EQUAL(x, 0.0))
+    {
+            gl_FragColor = axisColor;
+    }*/
+
+}
+    </stage>
+    <uniforms>
+    mvp;time;resolution
+    </uniforms>
+</BasicShader>
