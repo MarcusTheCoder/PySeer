@@ -112,10 +112,10 @@ class GLFrame(wx.Frame):
     def OnDraw(self, *args, **kwargs):
         "Draw the window."
         glClear(GL_COLOR_BUFFER_BIT)
-
+        
         # Drawing an example triangle in the middle of the screen
         glBegin(GL_TRIANGLES)
-        glColor(0, 0, 0)
+        glColor(0, 0.3, 0)
         glVertex(-.25, -.25)
         glVertex(.25, -.25)
         glVertex(0, .25)

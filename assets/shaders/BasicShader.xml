@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <BasicShader>
-    <stage type="vertex_shader">#version 450 core
+    <stage type="vertex_shader">#version 440 core
 layout (location=0) in vec3 position;
 uniform mat4 mvp;
 void main()
@@ -10,7 +10,7 @@ void main()
 }
 
     </stage>
-    <stage type="fragment_shader">#version 450 core
+    <stage type="fragment_shader">#version 440 core
 #define SCALE 5.0
 uniform float time;
 uniform vec2 resolution;
@@ -18,7 +18,7 @@ uniform vec2 resolution;
 #define SOFTEQUAL(X,Y,F) 0.01 / atan( DISTANCE(X,Y,F) )
 #define DRAW(D,X,Y,F,R,G,B) float D = SOFTEQUAL(X,Y,F); gl_FragColor += vec4( R*D, G*D, B*D, 1.0 );
 
-#define EQUAL(X,Y) abs((Y) - (X)) &lt 0.01
+#define EQUAL(X,Y) abs((Y) - (X)) &lt; 0.01
 
 float cosWave( float x)
 {
