@@ -53,33 +53,80 @@ def openShader(filepath):
         print(glGetProgramInfoLog(shadd))
 
     return Shader(prog_id,uniforms,shaderName,filepath)
-    
-def openModelData(filepath):
-    scene = pywavefront.Wavefront(filepath)
-    print(scene)
+def readOBJFile(filepath,printComments=False):
+    ''' Will read an object .OBJ file and return
+    information about the vertex positions, UV coords,
+    normals, and elements (Face-vertex indices)
+    '''
+    f = open(filepath)
+    if f is None:
+        return None
 
-    #TODO: Fix importing so that arrays go into vao
+    s = ""
+    v = []
+    vt = []
+    vn = []
+    vertsComplete = {} # 5/1/1 : [vert data]
+    vertCounter = 0
+    indices = []
+    while s != "END":
+        s = f.readline()
+        if not s:
+            s = "END"
+            continue
+        # Process the first element
+        splits = s.split(" ")
+        if len(splits >= 3):
+            # This is one of the valid tags
+            if splits[0] == "v":
+                v.append([float(splits[1]),float(splits[2]),float(splits[3])])
+            elif splits[0] == "vt":
+                vt.append([float(splits[1]),float(splits[2])])
+            elif splits[0] == "vn":
+                vn.append([float(splits[1]),float(splits[2]),float(splits[3])])
+            elif splits[0] == "f":                
+                for i in range(1,4):
+                    if not splits[i] in vertsComplete.keys():
+                        subs = splits[i].split("/")
+                        vertsComplete[splits[i]] = (vertCounter,v[int(subs[0])],vt[int(subs[1])],vn[int(subs[2])])
+                        vertCounter += 1                    
+                    indices.append(vertsComplete[splits[i]][0])
+            else:
+                # Unknown command
+                continue
+        else:
+            if splits[0].startswith("#") and printComments:
+                # We have a comment, print it out
+                print(s)
+    
+    return [vertsComplete,indices]
+
+def openModelData(filepath):
+    
+    objData = readOBJFile(filepath)
+    if objData is None:
+        raise Exception("openModelData() [Error]: Filepath invalid or invalid format")
     
     vao = glGenVertexArrays(1)
     glBindVertexArray(vao)
-    vbuff = glGenBuffers(1)
-    glBindBuffer(GL_ARRAY_BUFFER,vbuff)
-    #glBufferData(GL_ARRAY_BUFFER, <insert array of data here>)
-    #glVertexAttribPointer()
-    uvbuff = glGenBuffers(1)
-    glBindBuffer(GL_ARRAY_BUFFER,uvbuff)
-    #glBufferData(GL_ARRAY_BUFFER, <insert array of data here>)
-    #glVertexAttribPointer()
-    normbuff = glGenBuffers(1)
-    glBindBuffer(GL_ARRAY_BUFFER,normbuff)
-    #glBufferData(GL_ARRAY_BUFFER, <insert array of data here>)
-    #glVertexAttribPointer()
 
+    vertBuff = glGenBuffers(1)
+    glBindBuffer(GL_ARRAY_BUFFER,vertBuff)
+    totalSize = len(objData[1]) * (3 * sizeof(float))
+    l = []
+    for vert in objData[1]:
+        # Skip the numbering, just raw geometry
+        l.append(vert[1])
+        l.append(vert[2])
+        l.append(vert[3])
+    npArr = numpy.array(l)
+    glBufferData(GL_ARRAY_BUFFER,totalSize,npArr,GL_STATIC_DRAW)
+    
     glBindBuffer(GL_ARRAY_BUFFER,0)
     glBindVertexArray(0)
 
     return ModelData(vao,vbuff,uvbuff,normbuff)
     
-def createModel(modelDataDict,name,shaderDict,name):
-
+def createModel(modelDataDict,mname,shaderDict,sname):
+    pass
 

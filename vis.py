@@ -87,7 +87,7 @@ class GLFrame(wx.Frame):
         self.OnDraw()
         event.Skip()
 
-    #
+    
     # GLFrame OpenGL Event Handlers
 
     def OnInitGL(self):
@@ -96,7 +96,7 @@ class GLFrame(wx.Frame):
 
         # Initialize model data and shaders
         self.shaders["BasicShader"] = CanOpener.openShader("assets/shaders/BasicShader.xml")
-        #self.modelData["HexStack"] = CanOpener.openModelData("assets/models/HexBlocks.obj")
+        self.modelData["Cube"] = CanOpener.openModelData("assets/models/Cube.obj")
 
     def OnReshape(self, width, height):
         """Reshape the OpenGL viewport based on the dimensions of the window."""
