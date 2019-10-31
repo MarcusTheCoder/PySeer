@@ -10,12 +10,12 @@ class Shader(object):
 
 
 class ModelData(object):
-    def __init__(self,vao,vbuff,uvbuff,nbuff):
+    def __init__(self,vao,vertBuff,eleBuff):
         self.vao = vao
-        self.vbuff = vbuff
-        self.uvbuff = uvbuff
-        self.nbuff = nbuff
+        self.vertBuff = vertBuff
+        self.eleBuff = eleBuff
 
 class Model(object):
     def __init__(self,md,x,y,z):
-        pass
+        self.md = md
+        self.modelMatrix = 

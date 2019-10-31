@@ -99,7 +99,7 @@ def readOBJFile(filepath,printComments=False):
                 # We have a comment, print it out
                 print(s)
     
-    return [vertsComplete,indices]
+    return [indices,vertsComplete]
 
 def openModelData(filepath):
     
@@ -112,21 +112,34 @@ def openModelData(filepath):
 
     vertBuff = glGenBuffers(1)
     glBindBuffer(GL_ARRAY_BUFFER,vertBuff)
-    totalSize = len(objData[1]) * (3 * sizeof(float))
+    
     l = []
     for vert in objData[1]:
         # Skip the numbering, just raw geometry
-        l.append(vert[1])
-        l.append(vert[2])
-        l.append(vert[3])
+        l.append(vert[1][0]); l.append(vert[1][1]); l.append(vert[1][2])
+        l.append(vert[2][0]); l.append(vert[2][1])
+        l.append(vert[3][0]); l.append(vert[3][1]); l.append(vert[3][2])
+
     npArr = numpy.array(l)
-    glBufferData(GL_ARRAY_BUFFER,totalSize,npArr,GL_STATIC_DRAW)
+    glBufferData(GL_ARRAY_BUFFER,sizeof(npArr),npArr,GL_STATIC_DRAW)
+    glEnableVertexAttribArray(0)
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(float) * 3,0)
+    glEnableVertexAttribArray(1)
+    glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,sizeof(float) * 3,0)
+    glEnableVertexAttribArray(2)
+    glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,sizeof(float) * 3,0)
+
     
     glBindBuffer(GL_ARRAY_BUFFER,0)
+    eleBuff = glGenBuffers(1)
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,eleBuff)
+    npArr2 = numpy.array(objData[0])
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(npArr2),npArr2,GL_STATIC_DRAW)
+
     glBindVertexArray(0)
 
-    return ModelData(vao,vbuff,uvbuff,normbuff)
+    return ModelData(vao,vertBuff,eleBuff)
     
 def createModel(modelDataDict,mname,shaderDict,sname):
-    pass
+    
 
